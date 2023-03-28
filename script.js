@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const projectile = {
             x: player.x + player.width / 2,
             y: player.y,
-            width: 10,
-            height: 50,
+            width: 20,
+            height: 100,
             color: 'white'
         };
         projectiles.push(projectile);
