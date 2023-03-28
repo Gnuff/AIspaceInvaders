@@ -5,19 +5,52 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Game variables
     let player;
-    let playerDirection = 0; // -1 for left, 0 for no movement, 1 for right
+    let playerDirection = 0;
+    let projectiles = [];
+    let spacePressed = false;
+
+    const projectileSpeed = 8; // Adjust projectile speed here
 
     function init() {
         player = {
             x: canvas.width / 2,
             y: canvas.height - 50,
-            width: 100,
-            height: 40,
-            speed: 30, // Adjust the speed value as desired
+            width: 50,
+            height: 20,
+            speed: 30,
             color: 'white'
         };
+    }
+
+    function createProjectile() {
+        const projectile = {
+            x: player.x + player.width / 2,
+            y: player.y,
+            width: 5,
+            height: 15,
+            color: 'white'
+        };
+        projectiles.push(projectile);
+    }
+
+    function updateProjectiles() {
+        for (let i = 0; i < projectiles.length; i++) {
+            projectiles[i].y -= projectileSpeed;
+
+            // Remove projectile if it goes outside the screen
+            if (projectiles[i].y < -projectiles[i].height) {
+                projectiles.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function drawProjectiles() {
+        for (const projectile of projectiles) {
+            ctx.fillStyle = projectile.color;
+            ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
+        }
     }
 
     function update() {
@@ -28,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (player.x + player.width > canvas.width) {
             player.x = canvas.width - player.width;
         }
+
+        updateProjectiles();
     }
 
     function drawPlayer() {
@@ -38,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawPlayer();
+        drawProjectiles();
     }
 
     function gameLoop() {
@@ -46,20 +82,24 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(gameLoop);
     }
 
-  document.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-          playerDirection = -1;
-      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-          playerDirection = 1;
-      }
-  });
-  
-  document.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.code === 'ArrowRight' || e.code === 'KeyD') {
-          playerDirection = 0;
-      }
-  });
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+            playerDirection = -1;
+        } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+            playerDirection = 1;
+        } else if (e.code === 'Space' && !spacePressed) {
+            spacePressed = true;
+            createProjectile();
+        }
+    });
 
+    document.addEventListener('keyup', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.code === 'ArrowRight' || e.code === 'KeyD') {
+            playerDirection = 0;
+        } else if (e.code === 'Space') {
+            spacePressed = false;
+        }
+    });
 
     init();
     gameLoop();
