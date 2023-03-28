@@ -46,20 +46,20 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(gameLoop);
     }
 
-    // Event listeners for arrow keys
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'ArrowLeft') {
-            playerDirection = -1;
-        } else if (e.code === 'ArrowRight') {
-            playerDirection = 1;
-        }
-    });
+  document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+          playerDirection = -1;
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+          playerDirection = 1;
+      }
+  });
+  
+  document.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.code === 'ArrowRight' || e.code === 'KeyD') {
+          playerDirection = 0;
+      }
+  });
 
-    document.addEventListener('keyup', (e) => {
-        if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
-            playerDirection = 0;
-        }
-    });
 
     init();
     gameLoop();
