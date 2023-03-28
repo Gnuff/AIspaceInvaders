@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
             y: canvas.height - 50,
             width: 50,
             height: 20,
-            speed: 20,
+            speed: 500,
             color: 'white'
         };
     }
