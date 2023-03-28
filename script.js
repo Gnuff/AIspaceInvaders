@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
             x: canvas.width / 2,
             y: canvas.height - 50,
             width: 100,
-            height: 40,
+            height: 200,
             speed: 30,
             color: 'white'
         };
