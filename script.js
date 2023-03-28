@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
             y: canvas.height - 50,
             width: 50,
             height: 20,
-            speed: 10, // Adjust the speed value as desired
+            speed: 20, // Adjust the speed value as desired
             color: 'white'
         };
     }
