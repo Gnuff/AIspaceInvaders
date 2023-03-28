@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
         player = {
             x: canvas.width / 2,
             y: canvas.height - 50,
-            width: 50,
-            height: 20,
+            width: 100,
+            height: 40,
             speed: 30, // Adjust the speed value as desired
             color: 'white'
         };
