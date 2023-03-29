@@ -14,6 +14,9 @@ const LOST_SCREEN = 3;
 
 let gameState = STARTING_SCREEN;
 
+let score = 0;
+
+
 // const menuMusic = new Audio('audio/backgroundMusic/menu.wav');
 // menuMusic.loop = true;
 // 
@@ -410,6 +413,19 @@ function updateProjectiles() {
                 i--;
                 
                 playSniffSound();
+                console.log('Nostril hit:', noses[j].nostrilL.color, noses[j].nostrilR.color, score);
+
+                if (noses[j].nostrilL.color === 'rgba(0, 255, 0, 0.5)') {
+                    score += 5;
+                } else if (noses[j].nostrilL.color === 'rgba(255, 0, 0, 0.5)') {
+                    score += 1;
+                }
+                if (noses[j].nostrilR.color === 'rgba(0, 255, 0, 0.5)') {
+                    score += 5;
+                } else if (noses[j].nostrilR.color === 'rgba(255, 0, 0, 0.5)') {
+                    score += 1;
+                }
+
                 
                 break;
             }
@@ -422,6 +438,8 @@ function updateProjectiles() {
         }
     }
 }
+
+
 
 function drawProjectiles() {
     for (const projectile of projectiles) {
@@ -509,10 +527,13 @@ function update(timestamp) {
                     // Handle game over logic here
                     console.log("Game Over");
                     gameState = LOST_SCREEN
+                    score -= 10;
                     break;
                 }
                 if (allNosesDestroyed()) {
                     gameState = WIN_SCREEN;
+                    score += 10;
+                    score += remainingProjectiles * 10;
                 }
             }
             
@@ -541,6 +562,7 @@ function update(timestamp) {
                 const snot = snots[i];
                 if (checkCollision(snot, player)) {
                     console.log("Snot collision detected");
+                    score -= 3;
                     projectilesRemaining -= 4;
                     snots.splice(i, 1);
                     i--;
@@ -559,7 +581,7 @@ function update(timestamp) {
             break;
         case WIN_SCREEN:
             // Handle win screen logic here
-            console.log("Switched to WIN_SCREEN");
+            // console.log("Switched to WIN_SCREEN");
             if (youWonMusicBuffer && (!currentSource || currentSource.buffer !== youWonMusicBuffer)) {
                 playBuffer(youWonMusicBuffer);
             }
@@ -593,10 +615,10 @@ function update(timestamp) {
             // }
           break;
         case LOST_SCREEN:
-        console.log("Switched to Lost_SCREEN");
-        if (youLostMusicBuffer && (!currentSource || currentSource.buffer !== youLostMusicBuffer)) {
-            playBuffer(youLostMusicBuffer);
-        }
+          // console.log("Switched to Lost_SCREEN");
+          if (youLostMusicBuffer && (!currentSource || currentSource.buffer !== youLostMusicBuffer)) {
+              playBuffer(youLostMusicBuffer);
+          }
           break;
         default:
             if (currentSource) {
@@ -621,7 +643,11 @@ function update(timestamp) {
     
 }
 
-
+function drawScore() {
+    ctx.font = '24px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Score: ' + score, 10, 30);
+}
 
 function drawPlayer() {
     ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
@@ -714,7 +740,7 @@ function drawBackground() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
-
+    drawScore();
     switch (gameState) {
         case STARTING_SCREEN:
           // Draw starting screen content here
@@ -730,7 +756,7 @@ function draw() {
           startGameButton.style.display = 'block';
           startGameButton.style.position = 'absolute';
           startGameButton.style.left = '50%';
-          startGameButton.style.top = (canvas.height / 2 + logoHeight / 2 * scaleFactor + 50) + 'px';
+          startGameButton.style.top = (canvas.height / 2 + logoHeight / 3 * scaleFactor + 10) + 'px';
           startGameButton.style.transform = 'translateX(-50%)';
           break;
         case IN_GAME:
