@@ -24,6 +24,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 let menuMusicBuffer;
 let stage1MusicBuffer;
+let youWonMusicBuffer;
 
 
 // Create the button element
@@ -67,7 +68,7 @@ let projectiles = [];
 let spacePressed = false;
 let noses = [];
 const nosesPerRow = 6; // Set the number of noses per row
-const totalNoses = 18; // Set the total number of noses
+const totalNoses = 16; // Set the total number of noses
 
 const projectileSpeed = 4; // Adjust projectile speed here
 const totalProjectilesAllowed = 40; // Set the total number of projectiles allowed
@@ -114,9 +115,16 @@ loadAudioFile('audio/backgroundMusic/stage1.wav', (buffer) => {
     stage1MusicBuffer = buffer;
 });
 
+loadAudioFile('audio/backgroundMusic/youWon.wav', (buffer) => {
+    youWonMusicBuffer = buffer;
+    if (gameState === WIN_SCREEN && youWonMusicBuffer) {
+        playBuffer(youWonMusicBuffer);
+    }
+});
+
 let currentSource = null;
 
-function playBuffer(buffer) {
+function playBuffer(buffer, callback) {
     if (currentSource) {
         currentSource.stop();
     }
@@ -125,8 +133,15 @@ function playBuffer(buffer) {
     source.buffer = buffer;
     source.loop = true;
     source.connect(audioContext.destination);
-    source.start(0);
 
+    // Wait for the buffer to load before playing it
+    source.onended = function() {
+        if (callback) {
+            callback();
+        }
+    };
+
+    source.start(0);
     currentSource = source;
 }
 
@@ -374,16 +389,17 @@ function drawProjectiles() {
 
 let showWin = false;
 
-// Call this function to start the periodic update of noseGroupSpeed
-function startNoseGroupSpeedUpdate() {
-  setInterval(function() {
-    noseGroupSpeed += 1.01;
-  }, 1000);
-}
+// // Call this function to start the periodic update of noseGroupSpeed
+// function startNoseGroupSpeedUpdate() {
+//   setInterval(function() {
+//     noseGroupSpeed += 1.01;
+//   }, 1000);
+// }
 
 function update(timestamp) {
     const deltaTime = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
+    let nextState = null;
     switch (gameState) {
         case STARTING_SCREEN:
             // Handle starting screen logic here
@@ -489,19 +505,25 @@ function update(timestamp) {
             }
             
             if (allNosesDestroyed()) {
-                showWin = true;
+                nextState = WIN_SCREEN;
             }
             break;
         case WIN_SCREEN:
             // Handle win screen logic here
+            console.log("Switched to WIN_SCREEN");
+            if (youWonMusicBuffer && (!currentSource || currentSource.buffer !== youWonMusicBuffer)) {
+                playBuffer(youWonMusicBuffer);
+            }
             break;
         case LOST_SCREEN:
             // Handle lost screen logic here
             break;
     }
-    requestAnimationFrame(update);
     switch (gameState) {
         case STARTING_SCREEN:
+        // if (youWonMusicBuffer && (!currentSource || currentSource.buffer !== youWonMusicBuffer)) {
+        //     playBuffer(youWonMusicBuffer);
+        // }
             if (menuMusicBuffer && (!currentSource || currentSource.buffer !== menuMusicBuffer)) {
                 playBuffer(menuMusicBuffer);
             }
@@ -511,6 +533,12 @@ function update(timestamp) {
                 playBuffer(stage1MusicBuffer);
             }
             break;
+        case WIN_SCREEN:
+            // console.log("Switched to WIN_SCREEN");
+            // if (youWonMusicBuffer && (!currentSource || currentSource.buffer !== youWonMusicBuffer)) {
+            //     playBuffer(youWonMusicBuffer);
+            // }
+          break;
         default:
             if (currentSource) {
                 currentSource.stop();
@@ -518,6 +546,12 @@ function update(timestamp) {
             }
             break;
     }
+    if (nextState) {
+        gameState = nextState;
+    }
+    
+    requestAnimationFrame(update);
+    
 }
 
 
@@ -584,6 +618,7 @@ function showWinScreen() {
     ctx.fillStyle = "white";
     ctx.font = "48px sans-serif";
     ctx.fillText("You Win!", canvas.width / 2 - 100, canvas.height / 2 - 50);
+    // console.log("Switched to WIN_SCREEN");
 }
 
 const backgroundCanvas = document.createElement('canvas');
@@ -637,7 +672,7 @@ function draw() {
             startGameButton.style.position = 'absolute';
             startGameButton.style.left = (canvas.width / 2 - startGameButton.clientWidth / 2) + 'px';
             startGameButton.style.top = (canvas.height / 2 + logoHeight / 3 * scaleFactor + 120-60) + 'px';
-            startNoseGroupSpeedUpdate();
+            // startNoseGroupSpeedUpdate();
           break;
         case IN_GAME:
             // Draw in-game content here (your current draw() content)
@@ -660,6 +695,7 @@ function draw() {
         case WIN_SCREEN:
             // Draw win screen content here
             showWinScreen();
+            // console.log("Switched to WIN_SCREEN2");
             break;
         case LOST_SCREEN:
             // Draw lost screen content here
