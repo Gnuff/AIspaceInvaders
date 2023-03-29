@@ -25,7 +25,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let menuMusicBuffer;
 let stage1MusicBuffer;
 let youWonMusicBuffer;
-
+let youLostMusicBuffer;
 
 // Create the button element
 const startGameButton = document.createElement('img');
@@ -138,6 +138,13 @@ loadAudioFile('audio/backgroundMusic/stage1.wav', (buffer) => {
 
 loadAudioFile('audio/backgroundMusic/youWon.wav', (buffer) => {
     youWonMusicBuffer = buffer;
+    // if (gameState === WIN_SCREEN && youWonMusicBuffer) {
+    //     playBuffer(youWonMusicBuffer);
+    // }
+});
+
+loadAudioFile('audio/backgroundMusic/youLost.wav', (buffer) => {
+    youLostMusicBuffer = buffer;
     // if (gameState === WIN_SCREEN && youWonMusicBuffer) {
     //     playBuffer(youWonMusicBuffer);
     // }
@@ -540,6 +547,12 @@ function update(timestamp) {
                 }
             }
             
+            // Check if there are 0 remaining projectiles
+            if (projectilesRemaining <= 0) {
+                console.log("Out of projectiles, game over!");
+                gameState = LOST_SCREEN;
+            }
+            
             if (allNosesDestroyed()) {
                 nextState = WIN_SCREEN;
             }
@@ -553,6 +566,10 @@ function update(timestamp) {
             break;
         case LOST_SCREEN:
             // Handle lost screen logic here
+            // console.log("Switched to Lost_SCREEN");
+            // if (youLostMusicBuffer && (!currentSource || currentSource.buffer !== youLostMusicBuffer)) {
+            //     playBuffer(youLostMusicBuffer);
+            // }
             break;
     }
     switch (gameState) {
@@ -574,6 +591,12 @@ function update(timestamp) {
             // if (youWonMusicBuffer && (!currentSource || currentSource.buffer !== youWonMusicBuffer)) {
             //     playBuffer(youWonMusicBuffer);
             // }
+          break;
+        case LOST_SCREEN:
+        console.log("Switched to Lost_SCREEN");
+        if (youLostMusicBuffer && (!currentSource || currentSource.buffer !== youLostMusicBuffer)) {
+            playBuffer(youLostMusicBuffer);
+        }
           break;
         default:
             if (currentSource) {
@@ -738,6 +761,9 @@ function draw() {
             break;
         case LOST_SCREEN:
             // Draw lost screen content here
+            ctx.fillStyle = "white";
+            ctx.font = "68px sans-serif";
+            ctx.fillText("You Lost!", canvas.width / 2 - 100, canvas.height / 2 - 50);
             break;
     }
     // setTimeout(draw, 1000 / 60);
