@@ -14,6 +14,18 @@ const LOST_SCREEN = 3;
 
 let gameState = STARTING_SCREEN;
 
+// const menuMusic = new Audio('audio/backgroundMusic/menu.wav');
+// menuMusic.loop = true;
+// 
+// const stage1Music = new Audio('audio/backgroundMusic/stage1.wav');
+// stage1Music.loop = true;
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+let menuMusicBuffer;
+let stage1MusicBuffer;
+
+
 // Create the button element
 const startGameButton = document.createElement('button');
 startGameButton.innerHTML = 'Start Game';
@@ -81,6 +93,43 @@ logoImage.src = 'graphics/logo.png';
 logoImage.onload = function() {
   console.log('Logo image loaded');
 }
+
+function loadAudioFile(url, callback) {
+    const request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    request.onload = () => {
+        audioContext.decodeAudioData(request.response, (buffer) => {
+            callback(buffer);
+        });
+    };
+    request.send();
+}
+
+loadAudioFile('audio/backgroundMusic/menu.wav', (buffer) => {
+    menuMusicBuffer = buffer;
+});
+
+loadAudioFile('audio/backgroundMusic/stage1.wav', (buffer) => {
+    stage1MusicBuffer = buffer;
+});
+
+let currentSource = null;
+
+function playBuffer(buffer) {
+    if (currentSource) {
+        currentSource.stop();
+    }
+
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(audioContext.destination);
+    source.start(0);
+
+    currentSource = source;
+}
+
 
 function init() {
     console.log("init function called");
@@ -325,6 +374,13 @@ function drawProjectiles() {
 
 let showWin = false;
 
+// Call this function to start the periodic update of noseGroupSpeed
+function startNoseGroupSpeedUpdate() {
+  setInterval(function() {
+    noseGroupSpeed += 1.01;
+  }, 1000);
+}
+
 function update(timestamp) {
     const deltaTime = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
@@ -344,11 +400,6 @@ function update(timestamp) {
             
             // Update the projectileCounterBox's x position to follow the player
             projectileCounterBox.x = player.x;
-            
-            // Increase noseGroupSpeed by 0.01 every second
-            setInterval(function() {
-              noseGroupSpeed += 0.01;
-            }, 1000);
             
             // Move the group of noses horizontally
             for (const nose of noses) {
@@ -449,6 +500,24 @@ function update(timestamp) {
             break;
     }
     requestAnimationFrame(update);
+    switch (gameState) {
+        case STARTING_SCREEN:
+            if (menuMusicBuffer && (!currentSource || currentSource.buffer !== menuMusicBuffer)) {
+                playBuffer(menuMusicBuffer);
+            }
+            break;
+        case IN_GAME:
+            if (stage1MusicBuffer && (!currentSource || currentSource.buffer !== stage1MusicBuffer)) {
+                playBuffer(stage1MusicBuffer);
+            }
+            break;
+        default:
+            if (currentSource) {
+                currentSource.stop();
+                currentSource = null;
+            }
+            break;
+    }
 }
 
 
@@ -547,8 +616,8 @@ function draw() {
     switch (gameState) {
         case STARTING_SCREEN:
           // Draw starting screen content here
-            ctx.fillStyle = "#91BD9A";
-            ctx.font = "68px sans-serif";
+            // ctx.fillStyle = "#91BD9A";
+            // ctx.font = "68px sans-serif";
           
             // Get the width and height of the logo image
             const logoWidth = logoImage.width;
@@ -559,15 +628,16 @@ function draw() {
             ctx.drawImage(logoImage, canvas.width / 2 - logoWidth / 2 * scaleFactor, canvas.height / 2 - logoHeight / 2 * scaleFactor - 100, logoWidth * scaleFactor, logoHeight * scaleFactor);
           
             // Draw the "NOSE INVADERS" text below the logo, centered
-            const textWidth = ctx.measureText("NOSE INVADERS").width;
-            const textX = canvas.width / 2 - textWidth / 2;
-            const textY = canvas.height / 2 + logoHeight / 2 * scaleFactor + 50;
-            ctx.fillText("NOSE INVADERS", textX, textY);
+            // const textWidth = ctx.measureText("NOSE INVADERS").width;
+            // const textX = canvas.width / 2 - textWidth / 2;
+            // const textY = canvas.height / 2 + logoHeight / 2 * scaleFactor + 50;
+            // ctx.fillText("NOSE INVADERS", textX, textY);
           
             startGameButton.style.display = 'block'; // Show the button
             startGameButton.style.position = 'absolute';
             startGameButton.style.left = (canvas.width / 2 - startGameButton.clientWidth / 2) + 'px';
-            startGameButton.style.top = (canvas.height / 2 + logoHeight / 2 * scaleFactor + 120) + 'px';
+            startGameButton.style.top = (canvas.height / 2 + logoHeight / 3 * scaleFactor + 120-60) + 'px';
+            startNoseGroupSpeedUpdate();
           break;
         case IN_GAME:
             // Draw in-game content here (your current draw() content)
