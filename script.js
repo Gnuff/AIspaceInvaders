@@ -28,12 +28,19 @@ let youWonMusicBuffer;
 
 
 // Create the button element
-const startGameButton = document.createElement('button');
-startGameButton.innerHTML = 'Start Game';
+const startGameButton = document.createElement('img');
+startGameButton.src = 'graphics/ui/playButton.png';
 startGameButton.id = 'startGameButton';
 startGameButton.style.display = 'none';
-startGameButton.style.fontSize = '34px';
-startGameButton.style.backgroundColor = '#91BD9A'; // Hide the button initially
+startGameButton.style.cursor = 'pointer';
+startGameButton.style.position = 'absolute';
+startGameButton.style.left = '50%';
+startGameButton.style.top = '50%';
+startGameButton.style.transform = 'translate(-50%, -50%)';
+startGameButton.style.width = '150px';
+startGameButton.style.height = 'auto';
+// startGameButton.style.fontSize = '34px';
+// startGameButton.style.backgroundColor = '#91BD9A'; // Hide the button initially
 
 // Append the button element to the body
 document.body.appendChild(startGameButton);
@@ -69,7 +76,7 @@ let projectiles = [];
 let spacePressed = false;
 let noses = [];
 const nosesPerRow = 6; // Set the number of noses per row
-const totalNoses = 1; // Set the total number of noses
+const totalNoses = 18; // Set the total number of noses
 
 const projectileSpeed = 4; // Adjust projectile speed here
 const totalProjectilesAllowed = 40; // Set the total number of projectiles allowed
@@ -92,11 +99,18 @@ backgroundImage.src = 'graphics/background.png';
 
 const logoImage = new Image();
 logoImage.src = 'graphics/logo.png';
+let logoHeight;
+const scaleFactor = 0.5;
+
 // logoImage.width = 100; // Set the width of the image to 200 pixels
 // logoImage.height = 100; 
 logoImage.onload = function() {
   console.log('Logo image loaded');
+  logoHeight = logoImage.height;
 }
+
+// const playBUttonImage = new Image();
+// playButtonImage.src = 'graphics/ui/playButton.png';
 
 function loadAudioFile(url, callback) {
     const request = new XMLHttpRequest();
@@ -558,7 +572,15 @@ function update(timestamp) {
     if (nextState) {
         gameState = nextState;
     }
-    
+    // Move the startGameButton positioning logic here
+    if (gameState === STARTING_SCREEN) {
+        startGameButton.style.display = 'block'; // Show the button
+        startGameButton.style.position = 'absolute';
+        startGameButton.style.left = (canvas.width / 2 - startGameButton.clientWidth / 2) + 'px';
+        startGameButton.style.top = (canvas.height / 2 + logoHeight / 3 * scaleFactor + 120-60) + 'px';
+    } else {
+        startGameButton.style.display = 'none'; // Hide the button
+    }
     requestAnimationFrame(update);
     
 }
@@ -660,28 +682,20 @@ function draw() {
     switch (gameState) {
         case STARTING_SCREEN:
           // Draw starting screen content here
-            // ctx.fillStyle = "#91BD9A";
-            // ctx.font = "68px sans-serif";
           
-            // Get the width and height of the logo image
-            const logoWidth = logoImage.width;
-            const logoHeight = logoImage.height;
+          // Get the width and height of the logo image
+          const logoWidth = logoImage.width;
+          const logoHeight = logoImage.height;
           
-            // Draw the logo image at twice the size
-            const scaleFactor = 0.5;
-            ctx.drawImage(logoImage, canvas.width / 2 - logoWidth / 2 * scaleFactor, canvas.height / 2 - logoHeight / 2 * scaleFactor - 100, logoWidth * scaleFactor, logoHeight * scaleFactor);
+          // Draw the logo image at twice the size
+          // const scaleFactor = 0.5;
+          ctx.drawImage(logoImage, canvas.width / 2 - logoWidth / 2 * scaleFactor, canvas.height / 2 - logoHeight / 2 * scaleFactor - 100, logoWidth * scaleFactor, logoHeight * scaleFactor);
           
-            // Draw the "NOSE INVADERS" text below the logo, centered
-            // const textWidth = ctx.measureText("NOSE INVADERS").width;
-            // const textX = canvas.width / 2 - textWidth / 2;
-            // const textY = canvas.height / 2 + logoHeight / 2 * scaleFactor + 50;
-            // ctx.fillText("NOSE INVADERS", textX, textY);
-          
-            startGameButton.style.display = 'block'; // Show the button
-            startGameButton.style.position = 'absolute';
-            startGameButton.style.left = (canvas.width / 2 - startGameButton.clientWidth / 2) + 'px';
-            startGameButton.style.top = (canvas.height / 2 + logoHeight / 3 * scaleFactor + 120-60) + 'px';
-            // startNoseGroupSpeedUpdate();
+          startGameButton.style.display = 'block';
+          startGameButton.style.position = 'absolute';
+          startGameButton.style.left = '50%';
+          startGameButton.style.top = (canvas.height / 2 + logoHeight / 2 * scaleFactor + 50) + 'px';
+          startGameButton.style.transform = 'translateX(-50%)';
           break;
         case IN_GAME:
             // Draw in-game content here (your current draw() content)
