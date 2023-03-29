@@ -60,6 +60,10 @@ playerImage.src = 'graphics/zipBagEmpty.png';
 const drugCounterBoxImage = new Image();
 drugCounterBoxImage.src = 'graphics/zipBagFull.png';
 
+// Load snot image
+const snotImage = new Image();
+snotImage.src = 'graphics/snot.png';
+
 function setCanvasDimensions() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -296,11 +300,20 @@ class Snot {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 20;
-        this.height = 30;
+        this.width = 40;
+        this.height = 60;
         this.speed = 0.5;
         this.color = 'green';
+        this.image = snotImage;
+        this.opacity = 0.8;
     }
+    
+    // draw() {
+    //     ctx.globalAlpha = this.opacity; // Set the globalAlpha to the snot's opacity
+    //     ctx.drawImage(snotImage, this.x, this.y, this.width, this.height);
+    //     ctx.globalAlpha = 0.1; // Reset the globalAlpha to fully opaque
+    // }
+    
 }
 function spawnSnot() {
     let closestNose = null;
@@ -647,7 +660,7 @@ function allNosesDestroyed() {
 
 function showWinScreen() {
     ctx.fillStyle = "white";
-    ctx.font = "48px sans-serif";
+    ctx.font = "68px sans-serif";
     ctx.fillText("You Win!", canvas.width / 2 - 100, canvas.height / 2 - 50);
     // console.log("Switched to WIN_SCREEN");
 }
@@ -710,8 +723,11 @@ function draw() {
                 // Draw snots
                 ctx.fillStyle = 'green';
                 for (const snot of snots) {
-                    ctx.fillRect(snot.x, snot.y, snot.width, snot.height);
+                    // ctx.fillRect(snot.x, snot.y, snot.width, snot.height);
+                    ctx.globalAlpha = snot.opacity;
+                    ctx.drawImage(snot.image, snot.x, snot.y, snot.width, snot.height);
                 }
+                ctx.globalAlpha = 1;
 
             }// Add this line to draw the projectile counter box
             break;
