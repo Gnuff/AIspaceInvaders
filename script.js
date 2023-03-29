@@ -116,6 +116,24 @@ logoImage.onload = function() {
   logoHeight = logoImage.height;
 }
 
+const gameOverImage = new Image();
+gameOverImage.src = 'graphics/gameOver.png';
+let gameOverHeight;
+
+gameOverImage.onload = function() {
+  console.log('game Over image loaded');
+  gameOverHeight = gameOverImage.height;
+}
+
+const youWonImage = new Image();
+youWonImage.src = 'graphics/youWon.png';
+let youWonHeight;
+
+youWonImage.onload = function() {
+  console.log('youWon image loaded');
+  youWonHeight = youWonImage.height;
+}
+
 // const playBUttonImage = new Image();
 // playButtonImage.src = 'graphics/ui/playButton.png';
 
@@ -708,9 +726,15 @@ function allNosesDestroyed() {
 }
 
 function showWinScreen() {
-    ctx.fillStyle = "white";
-    ctx.font = "68px sans-serif";
-    ctx.fillText("You Win!", canvas.width / 2 - 100, canvas.height / 2 - 50);
+    const youWonWidth = youWonImage.width;
+    const youWonHeight = youWonImage.height;
+    
+    // Draw the logo image at twice the size
+    // const scaleFactor = 0.5;
+    ctx.drawImage(youWonImage, canvas.width / 2 - youWonWidth / 2 * scaleFactor, canvas.height / 2 - youWonHeight / 2 * scaleFactor - 100, youWonWidth * scaleFactor, youWonHeight * scaleFactor);
+    // ctx.fillStyle = "white";
+    // ctx.font = "68px sans-serif";
+    // ctx.fillText("You Win!", canvas.width / 2 - 100, canvas.height / 2 - 50);
     // console.log("Switched to WIN_SCREEN");
 }
 
@@ -787,9 +811,17 @@ function draw() {
             break;
         case LOST_SCREEN:
             // Draw lost screen content here
-            ctx.fillStyle = "white";
-            ctx.font = "68px sans-serif";
-            ctx.fillText("You Lost!", canvas.width / 2 - 100, canvas.height / 2 - 50);
+            // Get the width and height of the logo image
+            const gameOverWidth = gameOverImage.width;
+            const gameOverHeight = gameOverImage.height;
+            
+            // Draw the logo image at twice the size
+            // const scaleFactor = 0.5;
+            ctx.drawImage(gameOverImage, canvas.width / 2 - gameOverWidth / 2 * scaleFactor, canvas.height / 2 - gameOverHeight / 2 * scaleFactor - 100, gameOverWidth * scaleFactor, gameOverHeight * scaleFactor);
+            
+            // ctx.fillStyle = "white";
+            // ctx.font = "68px sans-serif";
+            // ctx.fillText("You Lost!", canvas.width / 2 - 100, canvas.height / 2 - 50);
             break;
     }
     // setTimeout(draw, 1000 / 60);
