@@ -40,6 +40,7 @@ document.body.appendChild(startGameButton);
 
 // Add the event listener for the button
 startGameButton.addEventListener('click', () => {
+    buttonPushSound(); 
     gameState = IN_GAME;
     startGameButton.style.display = 'none'; // Hide the button when the game starts
 });
@@ -68,7 +69,7 @@ let projectiles = [];
 let spacePressed = false;
 let noses = [];
 const nosesPerRow = 6; // Set the number of noses per row
-const totalNoses = 16; // Set the total number of noses
+const totalNoses = 1; // Set the total number of noses
 
 const projectileSpeed = 4; // Adjust projectile speed here
 const totalProjectilesAllowed = 40; // Set the total number of projectiles allowed
@@ -81,6 +82,8 @@ const noseGroupVerticalStep = 20;
 const noseGroupHorizontalPadding = 50;
 
 const sniffSound = new Audio('audio/sniff.mp3');
+
+const buttonSound = new Audio('audio/buttonPush.wav');
 
 let snots = [];
 
@@ -117,9 +120,9 @@ loadAudioFile('audio/backgroundMusic/stage1.wav', (buffer) => {
 
 loadAudioFile('audio/backgroundMusic/youWon.wav', (buffer) => {
     youWonMusicBuffer = buffer;
-    if (gameState === WIN_SCREEN && youWonMusicBuffer) {
-        playBuffer(youWonMusicBuffer);
-    }
+    // if (gameState === WIN_SCREEN && youWonMusicBuffer) {
+    //     playBuffer(youWonMusicBuffer);
+    // }
 });
 
 let currentSource = null;
@@ -320,6 +323,12 @@ function playSniffSound() {
     const sniffSoundInstance = new Audio('audio/sniff.mp3');
     sniffSoundInstance.currentTime = 0; // Reset the audio playback position
     sniffSoundInstance.play(); // Play the audio
+}
+
+function buttonPushSound() {
+    const buttonPushSoundInstance = new Audio('audio/buttonPush.wav');
+    buttonPushSoundInstance.currentTime = 0; // Reset the audio playback position
+    buttonPushSoundInstance.play(); // Play the audio
 }
 
 function drawProjectileCounterBox() {
